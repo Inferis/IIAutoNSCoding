@@ -59,7 +59,7 @@ II_AUTO_NSCODING()
 
 makes sure they do. It automatically serializes all properties it can.
 
-You can even have it do it recursively for every "non-compliant" class it encounters during encoding:x:
+You can even have it do it recursively for every "non-compliant" class it encounters during encoding:
 
 ```objc
 II_AUTO_NSCODING(AUTO_INJECT_CHILDREN)
