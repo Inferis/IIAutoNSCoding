@@ -22,6 +22,7 @@ void IIAutoNSCodingAdoptSecureCoding(Class class) {
     class_addProtocol(class, @protocol(NSSecureCoding));
     
     // add the 'supportsSecureCoding' method
+    // TODO add check for existing method
     Method method = class_getClassMethod(class, @selector(supportsSecureCoding));
     IMP impl = imp_implementationWithBlock(^BOOL(id self) {
         return YES;
@@ -67,7 +68,7 @@ NSArray *IIAutoNSCodingDiscoverMapping(Class class) {
         NSString *setter = attrValue ? [NSString stringWithUTF8String:attrValue] : [NSString stringWithFormat:@"set%@%@:", [[name substringToIndex:1] uppercaseString], [name substringFromIndex:1]];
         free(attrValue);
         
-        if (type.length >= 3) {
+        if ([type characterAtIndex:0] == '@' && type.length >= 3) {
             NSString *className = [type substringWithRange:NSMakeRange(2, type.length-3)];
             Class class = NSClassFromString(className);
             if (class) {
@@ -201,6 +202,22 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                     break;
                 }
                     
+                case '^': { // pointer
+                    // do restore nil pointers
+                    if (value == nil) {
+                        SET_VALUE(self, selector, void*, nil);
+                    }
+                    break;
+                }
+
+                case '@': { // block
+                    // do restore nil blocks
+                    if (value == nil) {
+                        SET_VALUE(self, selector, id, nil);
+                    }
+                    break;
+                }
+
                 default:
                     break;
             }
@@ -321,6 +338,17 @@ void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *code
                     
                 case 'C': { // unsigned char
                     value = @(GET_VALUE(self, selector, unsigned char));
+                    break;
+                }
+                    
+                case '^': { // pointer
+                    // can't do it dave
+                    value = GET_VALUE(self, selector, void*) ? @[] : nil;
+                    break;
+                }
+
+                case '@': { // block
+                    value = GET_VALUE(self, selector, id) ? @[] : nil;
                     break;
                 }
                     
