@@ -13,11 +13,16 @@
 
 @property (nonatomic, strong) NSNumber *aNumber;
 @property (nonatomic, strong) NSValue *aValue;
+@property (nonatomic, assign) SEL select;
 
 @end
 
 @interface TestModel : NSObject
 
+@property (nonatomic, assign) Class aClass;
+@property (nonatomic, assign) struct objc_object aStruct;
+@property (nonatomic, assign) id(^block)(NSArray *abc);
+@property (nonatomic, assign) void* pointer;
 @property (nonatomic, strong, readonly) NSString *suchReadOnly;
 @property (nonatomic, strong) NSString *aString;
 @property (nonatomic, strong) NSDate *aDate;
