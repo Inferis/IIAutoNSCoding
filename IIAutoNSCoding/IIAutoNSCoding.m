@@ -131,6 +131,11 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
             id value = [coder decodeObjectOfClass:[NSNumber class] forKey:name];
             char type = [map[@"t"] characterAtIndex:0];
             switch (type) {
+                case ':': { // selector
+                    SET_VALUE(self, selector, SEL, NSSelectorFromString(value));
+                    break;
+                }
+
                 case 'i': { // int
                     SET_VALUE(self, selector, int, [value intValue]);
                     break;
@@ -249,6 +254,11 @@ void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *code
             id value = nil;
             char type = [map[@"t"] characterAtIndex:0];
             switch (type) {
+                case ':': { // selector
+                    value = NSStringFromSelector(GET_VALUE(self, selector, SEL));
+                    break;
+                }
+
                 case 'i': { // int
                     value = @(GET_VALUE(self, selector, int));
                     break;
