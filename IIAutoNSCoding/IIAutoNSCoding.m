@@ -137,6 +137,11 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                     break;
                 }
 
+                case '#': { // class
+                    SET_VALUE(self, selector, Class, NSClassFromString(value));
+                    break;
+                }
+
                 case 'i': { // int
                     SET_VALUE(self, selector, int, [value intValue]);
                     break;
@@ -201,7 +206,15 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                     SET_VALUE(self, selector, short, [value unsignedCharValue]);
                     break;
                 }
-                    
+
+                case '{': { // struct
+                    // do restore nil structs
+                    if (value == nil) {
+                        SET_VALUE(self, selector, void*, nil);
+                    }
+                    break;
+                }
+
                 case '^': { // pointer
                     // do restore nil pointers
                     if (value == nil) {
@@ -276,6 +289,11 @@ void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *code
                     break;
                 }
 
+                case '#': { // selector
+                    value = NSStringFromClass(GET_VALUE(self, selector, Class));
+                    break;
+                }
+                    
                 case 'i': { // int
                     value = @(GET_VALUE(self, selector, int));
                     break;
@@ -341,6 +359,11 @@ void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *code
                     break;
                 }
                     
+                case '{': { // struct
+                    value = GET_VALUE(self, selector, void*) ? @[] : nil;
+                    break;
+                }
+
                 case '^': { // pointer
                     // can't do it dave
                     value = GET_VALUE(self, selector, void*) ? @[] : nil;
