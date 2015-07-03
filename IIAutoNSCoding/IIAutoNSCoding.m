@@ -8,14 +8,56 @@
 
 #import "IIAutoNSCoding.h"
 
-#import <dlfcn.h>
 #import <objc/message.h>
 #import <objc/runtime.h>
 
-#import <mach-o/dyld.h>
-#import <mach-o/getsect.h>
+void IIAutoNSCodingAdoptSecureCoding(Class class);
+void IIAutoNSCodingAddMethod(Class class, SEL selector, id block);
+NSArray *IIAutoNSCodingDiscoverMapping(Class class);
+id IIAutoNSCodingInitializer(Class class, id self, NSCoder *coder);
+void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *coder, NSString *options);
+void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *coder, NSString *options);
 
-NSArray *IIFindClassesForAutoNSCoding();
+@implementation IIAutoNSCoding
+
++ (void)inject:(Class)class
+{
+    [self inject:class options:nil];
+}
+
++ (void)inject:(Class)class options:(NSString*)options
+{
+    // don't inject if already nscoding
+    if (!class || class_conformsToProtocol(class, @protocol(NSCoding))) {
+        return;
+    }
+    
+    // only do stuff in our app bundle
+    NSString *name = [[NSString alloc] initWithUTF8String:class_getImageName(class)];
+    if ([name rangeOfString:[[NSBundle mainBundle] bundlePath]].location == NSNotFound) {
+        return;
+    }
+
+    Class superclass = class_getSuperclass(class);
+    if (!class_conformsToProtocol(superclass, @protocol(NSCoding))) {
+        [self inject:superclass options:options];
+    }
+
+    IIAutoNSCodingAdoptSecureCoding(class);
+    
+    NSArray *mapping = IIAutoNSCodingDiscoverMapping(class);
+    IIAutoNSCodingAddMethod(class, @selector(initWithCoder:), ^(Class self, NSCoder* decoder) {
+        self = IIAutoNSCodingInitializer(class, self, decoder);
+        IIAutoNSCodingDecoder(class, mapping, self, decoder, options);
+        return self;
+    });
+    IIAutoNSCodingAddMethod(class, @selector(encodeWithCoder:), ^(Class self, NSCoder* coder) {
+        IIAutoNSCodingEncoder(class, mapping, self, coder, options);
+    });
+}
+
+@end
+
 
 void IIAutoNSCodingAdoptSecureCoding(Class class) {
     // add the nscoding protocol
@@ -118,7 +160,7 @@ id IIAutoNSCodingInitializer(Class class, id self, NSCoder *coder) {
     void(*objc_msgSendTyped)(id, SEL, type) = (void *)objc_msgSend; \
     objc_msgSendTyped(self, selector, value);
 
-void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *coder) {
+void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *coder, NSString *options) {
     for (NSDictionary *map in mapping) {
         NSString *name = map[@"n"];
         
@@ -384,37 +426,3 @@ void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *code
     }
 }
 
-@implementation IIAutoNSCoding
-
-+ (void)inject:(Class)class options:(NSString*)options
-{
-    // don't inject if already nscoding
-    if (!class || class_conformsToProtocol(class, @protocol(NSCoding))) {
-        return;
-    }
-    
-    // only do stuff in our app bundle
-    NSString *name = [[NSString alloc] initWithUTF8String:class_getImageName(class)];
-    if ([name rangeOfString:[[NSBundle mainBundle] bundlePath]].location == NSNotFound) {
-        return;
-    }
-
-    Class superclass = class_getSuperclass(class);
-    if (!class_conformsToProtocol(superclass, @protocol(NSCoding))) {
-        [self inject:superclass options:options];
-    }
-
-    IIAutoNSCodingAdoptSecureCoding(class);
-    
-    NSArray *mapping = IIAutoNSCodingDiscoverMapping(class);
-    IIAutoNSCodingAddMethod(class, @selector(initWithCoder:), ^(Class self, NSCoder* decoder) {
-        self = IIAutoNSCodingInitializer(class, self, decoder);
-        IIAutoNSCodingDecoder(class, mapping, self, decoder);
-        return self;
-    });
-    IIAutoNSCodingAddMethod(class, @selector(encodeWithCoder:), ^(Class self, NSCoder* coder) {
-        IIAutoNSCodingEncoder(class, mapping, self, coder, options);
-    });
-}
-
-@end

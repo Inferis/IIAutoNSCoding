@@ -20,6 +20,7 @@
 
 @interface IIAutoNSCoding : NSObject
 
++ (void)inject:(Class)class;
 + (void)inject:(Class)class options:(id)options;
 
 @end
