@@ -12,8 +12,6 @@
 
 @interface ViewController ()
 
-@property (nonatomic, strong) UIViewController *childController;
-
 @end
 
 @implementation ViewController
@@ -47,9 +45,5 @@
     NSLog(@"equal: %@", [model isEqual:model2] ? @"YES" : @"NO");
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 @end
