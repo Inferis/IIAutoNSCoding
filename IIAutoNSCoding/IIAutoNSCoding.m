@@ -198,7 +198,7 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                 }
                     
                 case 'c': { // char
-                    SET_VALUE(self, selector, short, [value charValue]);
+                    SET_VALUE(self, selector, char, [value charValue]);
                     break;
                 }
                     
