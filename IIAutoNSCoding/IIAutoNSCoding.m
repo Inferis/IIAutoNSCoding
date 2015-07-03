@@ -121,7 +121,7 @@ id IIAutoNSCodingInitializer(Class class, id self, NSCoder *coder) {
 void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *coder) {
     for (NSDictionary *map in mapping) {
         NSString *name = map[@"n"];
-
+        
         Class class = map[@"c"];
         SEL selector = [map[@"s"] pointerValue];
         if (class) {
@@ -136,12 +136,12 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                     SET_VALUE(self, selector, SEL, NSSelectorFromString(value));
                     break;
                 }
-
+                    
                 case '#': { // class
                     SET_VALUE(self, selector, Class, NSClassFromString(value));
                     break;
                 }
-
+                    
                 case 'i': { // int
                     SET_VALUE(self, selector, int, [value intValue]);
                     break;
@@ -153,22 +153,22 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                 }
                     
                 case 'l': { // long
-                    SET_VALUE(self, selector, short, [value longValue]);
+                    SET_VALUE(self, selector, long, [value longValue]);
                     break;
                 }
                     
                 case 'q': { // long long
-                    SET_VALUE(self, selector, short, [value longLongValue]);
+                    SET_VALUE(self, selector, long long, [value longLongValue]);
                     break;
                 }
                     
                 case 'I': { // unsigned int
-                    SET_VALUE(self, selector, short, [value unsignedIntValue]);
+                    SET_VALUE(self, selector, unsigned int, [value unsignedIntValue]);
                     break;
                 }
                     
                 case 'S': { // unsigned short
-                    SET_VALUE(self, selector, short, [value unsignedShortValue]);
+                    SET_VALUE(self, selector, unsigned short, [value unsignedShortValue]);
                     break;
                 }
                     
@@ -178,12 +178,12 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                 }
                     
                 case 'Q': { // unsigned long long
-                    SET_VALUE(self, selector, short, [value unsignedLongLongValue]);
+                    SET_VALUE(self, selector, unsigned long long, [value unsignedLongLongValue]);
                     break;
                 }
                     
                 case 'f': { // float
-                    SET_VALUE(self, selector, short, [value floatValue]);
+                    SET_VALUE(self, selector, float, [value floatValue]);
                     break;
                 }
                     
@@ -193,7 +193,7 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                 }
                     
                 case 'B': { // BOOL
-                    SET_VALUE(self, selector, short, [value boolValue]);
+                    SET_VALUE(self, selector, BOOL, [value boolValue]);
                     break;
                 }
                     
@@ -203,10 +203,10 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
                 }
                     
                 case 'C': { // unsigned char
-                    SET_VALUE(self, selector, short, [value unsignedCharValue]);
+                    SET_VALUE(self, selector,  unsigned char, [value unsignedCharValue]);
                     break;
                 }
-
+                    
                 case '{': { // struct
                     // do restore nil structs
                     if (value == nil) {
