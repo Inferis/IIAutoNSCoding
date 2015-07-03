@@ -245,7 +245,7 @@ void IIAutoNSCodingDecoder(Class class, NSArray *mapping, id self, NSCoder *code
 void IIAutoNSCodingEncoder(Class class, NSArray *mapping, id self, NSCoder *coder, NSString *options) {
     __block void(^autoInject)(Class, id) = ^(Class class, __unused id value) { };
     
-    if ([options containsString:AUTO_INJECT_CHILDREN]) {
+    if ([options rangeOfString:AUTO_INJECT_CHILDREN].location != NSNotFound) {
         autoInject = ^(Class injectClass, id value) {
             if (!injectClass || !value) return;
             
