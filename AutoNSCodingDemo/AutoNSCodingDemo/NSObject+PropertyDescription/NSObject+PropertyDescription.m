@@ -209,7 +209,7 @@
         class = [class superclass];
         if (!class) { break; }
 
-        name = [[NSString alloc] initWithUTF8String:class_getImageName(class)];
+        NSString *name = [[NSString alloc] initWithUTF8String:class_getImageName(class)];
         if ([name rangeOfString:[[NSBundle mainBundle] bundlePath]].location == NSNotFound) { break; }
 
         free(properties);
