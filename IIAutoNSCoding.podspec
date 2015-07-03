@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name      = 'IIAutoNSCoding'
   s.platform  = :ios, 6.0
-  s.version   = '0.1'
+  s.version   = '0.2'
   s.summary   = 'A way to add propertybased automatic NSCoding to any objects.'
   s.homepage  = "https://github.com/Inferis/#{s.name}"
   s.license   = { :type => 'MIT', :file => 'LICENSE' }
